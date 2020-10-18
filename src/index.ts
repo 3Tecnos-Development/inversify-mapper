@@ -1,13 +1,28 @@
+/* eslint-disable no-bitwise */
+/* eslint-disable no-console */
 /* eslint-disable no-useless-escape */
 /* eslint-disable import/prefer-default-export */
 /* eslint-disable global-require */
 /* eslint-disable import/no-dynamic-require */
 import * as fg from "fast-glob";
 import { Container } from "inversify";
+import fs from "fs";
+import path from "path";
 
-const path = require("path");
+const json = fs.readFileSync("inversify.config.json");
 
-const config = require(path.resolve(__dirname, "../inversify.config.json"));
+let config: any = null;
+try {
+  config = JSON.parse(json.toString());
+} catch (e) {
+  console.error(
+    "The 'inversify.config.json' file is not defined or invalid",
+    e
+  );
+}
+
+const dirname = require?.main?.filename || "";
+const appDir = path.dirname(dirname);
 
 export default class containerMap {
   static load(): Container {
@@ -19,7 +34,8 @@ export default class containerMap {
         ignore: config.map.exclude,
       }).forEach((file) => {
         const fName = file.replace(/^.*[\\\/]/, "").replace(/\.[^.]*$/, "");
-        const fPath = require(file.replace(".ts", "").replace("src", "."));
+        const fPath = require(appDir +
+          file.replace(".ts", "").replace("src", ""));
         const symbol = Symbol.for(fName);
 
         diContainerMap.bind(symbol).to(fPath[fName]);
