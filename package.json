@@ -1,0 +1,36 @@
+{
+  "name": "inversify-mapper",
+  "version": "0.1.0",
+  "description": "Mapper from Container to inversify",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/3Tecnos-Development/inversify-mapper.git"
+  },
+  "author": "Paulo Henrique",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/3Tecnos-Development/inversify-mapper/issues"
+  },
+  "homepage": "https://github.com/3Tecnos-Development/inversify-mapper#readme",
+  "dependencies": {
+    "fast-glob": "^3.2.4",
+    "inversify": "^5.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^14.11.10",
+    "@typescript-eslint/eslint-plugin": "^4.4.1",
+    "@typescript-eslint/parser": "^4.4.1",
+    "eslint": "^7.11.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-config-prettier": "^6.13.0",
+    "eslint-plugin-import": "^2.22.1",
+    "git-commit-msg-linter": "^3.0.0",
+    "typescript": "^4.0.3"
+  }
+}
