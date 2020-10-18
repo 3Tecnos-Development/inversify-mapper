@@ -15,7 +15,7 @@
 Install via NPM:
 
 ```bash
-npm install nversify-mapper
+npm install inversify-mapper
 
 ```
 
