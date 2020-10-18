@@ -6,6 +6,8 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "build": "tsc",
+    "lint": "eslint --ext .ts src",
+    "lint:fix": "eslint --fix . --max-warnings=0 --ext .ts src",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
