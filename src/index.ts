@@ -4,6 +4,7 @@
 import * as fg from "fast-glob";
 import { Container } from "inversify";
 import fs from "fs";
+import "reflect-metadata";
 
 const appRoot = process.env.PWD;
 
