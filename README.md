@@ -19,7 +19,7 @@ npm install inversify-mapper
 
 ```
 
-## Use
+## Use ContainerMap
 
 Create the file "inversify.config.json", and do your mapping from controllers, services, adapter, etc. See e.g.
 
@@ -39,6 +39,55 @@ Create the file "inversify.config.json", and do your mapping from controllers, s
 import containerMap from "inversify-mapper";
 
 const container = containerMap.load();
+```
+
+## Use injectMapper decorator
+
+> Approach _without_ using the injectMapper decorator
+
+// types.ts file
+
+```typescript
+let TYPES = {
+  AddSubscriptionController: Symbol.for("AddSubscriptionController"),
+
+  AddSubscriptionService: Symbol.for("AddSubscriptionService"),
+  DeleteSubscriptionService: Symbol("DeleteSubscriptionService"),
+  ListSubscriptionService: Symbol("ListSubscriptionService"),
+};
+
+export default TYPES;
+```
+
+// injection
+
+```typescript
+import { inject, injectable } from "inversify";
+
+@injectable()
+export class AddSubscriptionController {
+  constructor(
+	@inject(TYPES.AddSubscriptionService)
+	private readonly addSubscription: IAddSubscriptionUseCase
+  ) {}
+```
+
+> Approach using the injectMapper decorator
+
+// types.ts file no needed
+
+// injection
+
+```typescript
+import { injectable } from "inversify";
+import { injectMapper } from "inversify-mapper";
+
+@injectable()
+export class AddSubscriptionController {
+  constructor(
+	@injectMapper(AddSubscriptionService)
+	private readonly addSubscription: IAddSubscriptionUseCase
+  ) {}
 ```
 
 ## Disclaimer
