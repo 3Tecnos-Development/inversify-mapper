@@ -2,7 +2,7 @@
 /* eslint-disable import/no-dynamic-require */
 /* eslint-disable global-require */
 import * as fg from "fast-glob";
-import { Container } from "inversify";
+import { Container, inject } from "inversify";
 import fs from "fs";
 import "reflect-metadata";
 
@@ -44,3 +44,9 @@ export default class containerMap {
     return diContainerMap;
   }
 }
+
+function injectMapper<T>(Instance: T) {
+  return inject(Symbol.for(((Instance as unknown) as Function).name));
+}
+
+export { injectMapper };
