@@ -22,28 +22,41 @@ try {
   );
 }
 
-export default class containerMap {
-  static load(): Container {
-    const diContainerMap = new Container();
-    if (config) {
-      fg.sync(config.map.include, {
-        dot: true,
-        onlyFiles: true,
-        ignore: config.map.exclude,
-        cwd: appRoot,
-      }).forEach((file) => {
-        const fName = file.replace(/^.*[\\\/]/, "").replace(/\.[^.]*$/, "");
-        const fPath = require(appRoot +
-          file.replace(".ts", "").replace("src", "/src"));
-        const symbol = Symbol.for(fName);
+const diContainerMap: Container = new Container();
 
-        diContainerMap.bind(symbol).to(fPath[fName]);
-      });
-    }
+function load(): Container {
+  if (config) {
+    fg.sync(config.map.include, {
+      dot: true,
+      onlyFiles: true,
+      ignore: config.map.exclude,
+      cwd: appRoot,
+    }).forEach((file) => {
+      const fName = file.replace(/^.*[\\\/]/, "").replace(/\.[^.]*$/, "");
+      const fPath = require(appRoot +
+        file.replace(".ts", "").replace("src", "/src"));
+      const symbol = Symbol.for(fName);
 
-    return diContainerMap;
+      diContainerMap.bind(symbol).to(fPath[fName]);
+    });
+  }
+
+  return diContainerMap;
+}
+
+class ContainerMap {
+  private diContainerMap: Container;
+
+  constructor() {
+    this.diContainerMap = load();
+  }
+
+  load(): Container {
+    return this.diContainerMap;
   }
 }
+const containerMap = new ContainerMap();
+export default containerMap;
 
 function injectMapper<T>(Instance: T) {
   return inject(Symbol.for(((Instance as unknown) as Function).name));
