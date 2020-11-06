@@ -9,11 +9,14 @@ export default function injectMapper<T>(
   classRef: T,
   contextName?: string | symbol
 ) {
-  let prefix = "";
-
-  if (contextName && typeof contextName === "symbol") {
-    prefix = String(contextName).slice(7, -1) || "";
+  let context = "";
+  if (contextName) {
+    if (typeof contextName === "symbol") {
+      context = String(contextName).slice(7, -1) || "";
+    } else {
+      context = contextName;
+    }
   }
 
-  return inject(Symbol.for(prefix + ((classRef as unknown) as Function).name));
+  return inject(Symbol.for(context + ((classRef as unknown) as Function).name));
 }
