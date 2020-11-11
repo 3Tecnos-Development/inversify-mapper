@@ -1,6 +1,6 @@
 {
   "name": "inversify-mapper",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Mapper from Container to inversify",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
