@@ -6,7 +6,7 @@ import { Container } from "inversify";
 import fs from "fs";
 import "reflect-metadata";
 
-const appRoot = process.env.PWD;
+const appRoot = process.env.PWD || process.cwd();
 
 const json = fs.readFileSync(`${appRoot}/inversify.config.json`);
 
