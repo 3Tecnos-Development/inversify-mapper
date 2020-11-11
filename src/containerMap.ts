@@ -45,7 +45,7 @@ const diContainerMap: Container = new Container();
 function mapper(
   include: string | string[],
   exclude?: string[],
-  module?: string
+  module: string = ""
 ) {
   fg.sync(include, {
     dot: true,
