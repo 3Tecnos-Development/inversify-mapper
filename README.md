@@ -41,6 +41,69 @@ import containerMap from "inversify-mapper";
 const container = containerMap.load();
 ```
 
+## Use ContainerMap with contexts
+
+Create the file "inversify.config.json", and do your mapping from controllers, services, adapter, etc. See e.g.
+
+> Note that this way you can to name your injectable or controller classes with same names and it will be not conflict or ambiguous in the loadind.
+
+// inversify.config.json
+
+```json
+{
+  "map": {
+    "contexts": [
+      {
+        "name": "Vendor",
+        "include": [
+          "src/vendor/controllers/**/*Controller.ts",
+          "src/vendor/services/**/*Service.ts"
+        ],
+        "exclude": ["**/BaseHttp*"]
+      },
+      {
+        "name": "Customer",
+        "include": [
+          "src/customer/controllers/**/*Controller.ts",
+          "src/customer/services/**/*Service.ts"
+        ],
+        "exclude": ["**/BaseHttp*"]
+      }
+    ]
+  }
+}
+```
+
+// src/customer/services/AddSubscriptionService.ts
+
+```typescript
+import { inject, injectable } from "inversify";
+
+@injectable()
+export class AddSubscriptionService {
+  constructor(
+  ) {}
+
+  async handle(data: Subscription): Promise<Subscription> {
+	  ...
+  }
+```
+
+// src/vendor/services/AddSubscriptionService.ts
+
+```typescript
+import { inject, injectable } from "inversify";
+
+@injectable()
+export class AddSubscriptionService {
+  constructor(
+  ) {}
+
+  async handle(data: Subscription): Promise<Subscription> {
+	  ...
+  }
+```
+
 ## Use injectMapper decorator
 
 > Approach _without_ using the injectMapper decorator
@@ -86,6 +149,28 @@ import { injectMapper } from "inversify-mapper";
 export class AddSubscriptionController {
   constructor(
 	@injectMapper(AddSubscriptionService)
+	private readonly addSubscription: IAddSubscriptionUseCase
+  ) {}
+```
+
+## Use injectMapper decorator with contexts
+
+> _context_ => name of the context in "inversify.config.json" file
+
+```typescript
+@injectMapper(AddSubscriptionService, context)
+```
+
+##### Use
+
+```typescript
+import { injectable } from "inversify";
+import { injectMapper } from "inversify-mapper";
+
+@injectable()
+export class AddSubscriptionController {
+  constructor(
+	@injectMapper(AddSubscriptionService, "Customer")
 	private readonly addSubscription: IAddSubscriptionUseCase
   ) {}
 ```
