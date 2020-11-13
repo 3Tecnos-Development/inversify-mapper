@@ -18,5 +18,7 @@ export default function injectMapper<T>(
     }
   }
 
-  return inject(Symbol.for(context + ((classRef as unknown) as Function).name));
+  return inject(
+    Symbol.for(context + ((classRef as unknown) as Function)?.name || "")
+  );
 }
