@@ -175,6 +175,22 @@ export class AddSubscriptionController {
   ) {}
 ```
 
+## Use injectableSingleton decorator
+
+> If you want to inject the class using Singleton, this is a very simple approach:
+
+```typescript
+import { injectable } from "inversify";
+import { injectMapper, injectableSingleton } from "inversify-mapper";
+
+@injectableSingleton()
+export class AddSubscriptionService {
+  constructor(
+	@injectMapper(AddSubscriptionRepository)
+	private readonly addSubscription: IAddSubscriptionRepository
+  ) {}
+```
+
 ## Disclaimer
 
 > If you use alias path to the directories in your ts-config, it is need to do some addition config. See it below:
