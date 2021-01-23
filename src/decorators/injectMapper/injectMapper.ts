@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import { inject } from "inversify";
 
 /**
@@ -5,10 +6,7 @@ import { inject } from "inversify";
  * @param classRef Reference of the class
  * @param contextName Name of the context to scope the class
  */
-export default function injectMapper<T>(
-  classRef: T,
-  contextName?: string | symbol
-) {
+export function injectMapper<T>(classRef: T, contextName?: string | symbol) {
   let context = "";
   if (contextName) {
     if (typeof contextName === "symbol") {

@@ -5,6 +5,7 @@ import * as fg from "fast-glob";
 import { Container } from "inversify";
 import fs from "fs";
 import "reflect-metadata";
+import { defaultStorage } from "./storage/Storage";
 
 const appRoot = process.env.PWD || process.cwd();
 
@@ -58,7 +59,15 @@ function mapper(
       file.replace(".ts", "").replace("src", "/src"));
     const symbol = Symbol.for(module + fName);
 
-    diContainerMap.bind(symbol).to(fPath[fName]);
+    const isSingleton = defaultStorage.hasSingleton({
+      objectName: fName,
+    });
+
+    if (isSingleton) {
+      diContainerMap.bind(symbol).to(fPath[fName]).inSingletonScope();
+    } else {
+      diContainerMap.bind(symbol).to(fPath[fName]);
+    }
   });
 }
 
