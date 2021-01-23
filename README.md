@@ -180,7 +180,6 @@ export class AddSubscriptionController {
 > If you want to inject the class using Singleton, this is a very simple approach:
 
 ```typescript
-import { injectable } from "inversify";
 import { injectMapper, injectableSingleton } from "inversify-mapper";
 
 @injectableSingleton()
