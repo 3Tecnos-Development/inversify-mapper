@@ -249,7 +249,11 @@ npm run postinstall
 
 > :warning: Set the NODE_ENV=production environment variable. This package reads the 'outDir' property from your tsconfig.json file to get the root directory.
 
-For the package to run correctly in production, assign a value in outDir
+For the package to run correctly in production, assign a value in outDir.
+
+### e.g.
+
+tsconfig.json
 
 ```json
 {
@@ -258,3 +262,5 @@ For the package to run correctly in production, assign a value in outDir
   }
 }
 ```
+
+> The default directory for the development environment is 'src'
