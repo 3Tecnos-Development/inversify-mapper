@@ -35,10 +35,11 @@ let config: IConfig = {} as IConfig;
 /**
  * Read a json file and remove comments
  */
-function requireJSON(json: string) {
+function requireJSON(jsonContent: string) {
   return JSON.parse(
-    json.replace(/\\"|"(?:\\"|[^"])*"|(\/\/.*|\/\*[\s\S]*?\*\/)/g, (m, g) =>
-      g ? "" : m
+    jsonContent.replace(
+      /\\"|"(?:\\"|[^"])*"|(\/\/.*|\/\*[\s\S]*?\*\/)/g,
+      (m, g) => (g ? "" : m)
     )
   );
 }
@@ -86,7 +87,7 @@ function getBasePath(): string {
 }
 
 function importFrom(file: string) {
-  const fullPath = appRoot + "/" + file.replace(".ts", "").replace(".js", "");
+  const fullPath = `${appRoot}/${file.replace(".ts", "").replace(".js", "")}`;
   return require(fullPath);
 }
 
@@ -94,7 +95,7 @@ function resolvePathFromBase(
   paths: string[] | undefined
 ): string[] | undefined {
   if (paths) {
-    let result: string[] = [];
+    const result: string[] = [];
     const basePath = getBasePath();
     paths.forEach((path) => {
       const hasBasePath =
@@ -104,11 +105,12 @@ function resolvePathFromBase(
       if (hasBasePath) {
         result.push(path);
       } else {
-        result.push(basePath + "/" + path);
+        result.push(`${basePath}/${path}`);
       }
     });
     return result;
   }
+  return undefined;
 }
 
 function mapper(include: string[], exclude?: string[], module: string = "") {
