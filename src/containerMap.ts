@@ -6,12 +6,13 @@ import { Container } from "inversify";
 import fs from "fs";
 import "reflect-metadata";
 import { defaultStorage } from "./storage/Storage";
+import { ITsConfig } from "./interfaces/ITsConfig";
 
 const appRoot = process.env.PWD || process.cwd();
 
 const json = fs.readFileSync(`${appRoot}/inversify.config.json`);
 
-type includeType = string | string[];
+type includeType = string[];
 
 type excludeType = string[];
 
@@ -31,8 +32,20 @@ interface IConfig {
 
 let config: IConfig = {} as IConfig;
 
+/**
+ * Read a json file and remove comments
+ */
+function requireJSON(jsonContent: string) {
+  return JSON.parse(
+    jsonContent.replace(
+      /\\"|"(?:\\"|[^"])*"|(\/\/.*|\/\*[\s\S]*?\*\/)/g,
+      (m, g) => (g ? "" : m)
+    )
+  );
+}
+
 try {
-  config = JSON.parse(json.toString());
+  config = requireJSON(json.toString());
 } catch (e) {
   // eslint-disable-next-line no-console
   console.error(
@@ -43,20 +56,75 @@ try {
 
 const diContainerMap: Container = new Container();
 
-function mapper(
-  include: string | string[],
-  exclude?: string[],
-  module: string = ""
-) {
-  fg.sync(include, {
+function getTsConfigObject(): ITsConfig {
+  const tsConfigFilePath = `${appRoot}/tsconfig.json`;
+  const hasTsConfigFile = fs.existsSync(tsConfigFilePath);
+  if (!hasTsConfigFile) {
+    throw new Error("'tsconfig.json' file is not found.");
+  }
+  const tsConfigFile = fs.readFileSync(tsConfigFilePath);
+  return requireJSON(tsConfigFile.toString());
+}
+
+function getBasePath(): string {
+  const environment = process.env.NODE_ENV;
+  const isProduction = environment === "production";
+
+  if (isProduction) {
+    const { outDir } = getTsConfigObject().compilerOptions;
+
+    if (!outDir) {
+      throw new Error(
+        "'outDir' is not defined. Set the outDir property in the tsconfig file."
+      );
+    }
+
+    return outDir;
+  }
+
+  // Development default path
+  return "src";
+}
+
+function importFrom(file: string) {
+  const fullPath = `${appRoot}/${file.replace(".ts", "").replace(".js", "")}`;
+  return require(fullPath);
+}
+
+function resolvePathFromBase(
+  paths: string[] | undefined
+): string[] | undefined {
+  if (paths) {
+    const result: string[] = [];
+    const basePath = getBasePath();
+    paths.forEach((path) => {
+      const hasBasePath =
+        path.length >= basePath.length &&
+        path.substring(0, basePath.length) === basePath;
+
+      if (hasBasePath) {
+        result.push(path);
+      } else {
+        result.push(`${basePath}/${path}`);
+      }
+    });
+    return result;
+  }
+  return undefined;
+}
+
+function mapper(include: string[], exclude?: string[], module: string = "") {
+  const resolvedInclude = resolvePathFromBase(include);
+  const resolvedExclude = resolvePathFromBase(exclude);
+
+  fg.sync(resolvedInclude!, {
     dot: true,
     onlyFiles: true,
-    ignore: exclude,
+    ignore: resolvedExclude,
     cwd: appRoot,
   }).forEach((file) => {
     const fName = file.replace(/^.*[\\\/]/, "").replace(/\.[^.]*$/, "");
-    const fPath = require(appRoot +
-      file.replace(".ts", "").replace("src", "/src"));
+    const fPath = importFrom(file);
     const symbol = Symbol.for(module + fName);
 
     const isSingleton = defaultStorage.hasSingleton({

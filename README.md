@@ -26,9 +26,10 @@ Create the file "inversify.config.json", and do your mapping from controllers, s
 ```json
 {
   "map": {
+    /* matches all files in the src directory (any level of nesting) that have the .ts or .js extension.*/
     "include": [
-      "src/controllers/**/*Controller.ts",
-      "src/services/**/*Service.ts"
+      "controllers/**/*Controller.{ts,js}",
+      "services/**/*Service.{ts,js}"
     ],
     "exclude": ["**/BaseHttp*"]
   }
@@ -55,17 +56,18 @@ Create the file "inversify.config.json", and do your mapping from controllers, s
     "contexts": [
       {
         "name": "Vendor",
+        /* matches all files in the src directory (any level of nesting) that have the .ts or .js extension.*/
         "include": [
-          "src/vendor/controllers/**/*Controller.ts",
-          "src/vendor/services/**/*Service.ts"
+          "vendor/controllers/**/*Controller.{ts,js}",
+          "vendor/services/**/*Service.{ts,js}"
         ],
         "exclude": ["**/BaseHttp*"]
       },
       {
         "name": "Customer",
         "include": [
-          "src/customer/controllers/**/*Controller.ts",
-          "src/customer/services/**/*Service.ts"
+          "customer/controllers/**/*Controller.{ts,js}",
+          "customer/services/**/*Service.{ts,js}"
         ],
         "exclude": ["**/BaseHttp*"]
       }
@@ -241,4 +243,18 @@ And so just execute once time, or always that you change your mapping
 
 ```bash
 npm run postinstall
+```
+
+## Package in Production Enviroment
+
+> :warning: Set the NODE_ENV=production environment variable. This package reads the 'outDir' property from your tsconfig.json file to get the root directory.
+
+For the package to run correctly in production, assign a value in outDir
+
+```json
+{
+  "compilerOptions": {
+    "outDir": "dist" /* Redirect output structure to the directory. */
+  }
+}
 ```
