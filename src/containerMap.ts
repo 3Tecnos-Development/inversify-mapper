@@ -113,6 +113,18 @@ function resolvePathFromBase(
   return undefined;
 }
 
+function getClassNameFromFile(file: string, importedFile: any): string {
+  const fileName = file
+    .replace(/^.*[\\\/]/, "")
+    .replace(/\.[^.]*$/, "")
+    .replace(/[^a-zA-Z0-9]/g, "")
+    .toLowerCase();
+  const filtered = Object.keys(importedFile).filter(
+    (key) => fileName === key.toLowerCase()
+  );
+  return filtered.length > 0 ? filtered[0] : "";
+}
+
 function mapper(include: string[], exclude?: string[], module: string = "") {
   const resolvedInclude = resolvePathFromBase(include);
   const resolvedExclude = resolvePathFromBase(exclude);
@@ -123,18 +135,21 @@ function mapper(include: string[], exclude?: string[], module: string = "") {
     ignore: resolvedExclude,
     cwd: appRoot,
   }).forEach((file) => {
-    const fName = file.replace(/^.*[\\\/]/, "").replace(/\.[^.]*$/, "");
-    const fPath = importFrom(file);
-    const symbol = Symbol.for(module + fName);
+    const importedFile = importFrom(file);
+    const className = getClassNameFromFile(file, importedFile);
+    const symbol = Symbol.for(module + className);
 
     const isSingleton = defaultStorage.hasSingleton({
-      objectName: fName,
+      objectName: className,
     });
 
     if (isSingleton) {
-      diContainerMap.bind(symbol).to(fPath[fName]).inSingletonScope();
+      diContainerMap
+        .bind(symbol)
+        .to(importedFile[className])
+        .inSingletonScope();
     } else {
-      diContainerMap.bind(symbol).to(fPath[fName]);
+      diContainerMap.bind(symbol).to(importedFile[className]);
     }
   });
 }
