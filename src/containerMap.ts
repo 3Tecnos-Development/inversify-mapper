@@ -6,7 +6,6 @@ import { Container } from "inversify";
 import fs from "fs";
 import "reflect-metadata";
 import { defaultStorage } from "./storage/Storage";
-import { ITsConfig } from "./interfaces/ITsConfig";
 
 const appRoot = process.env.PWD || process.cwd();
 
@@ -23,6 +22,7 @@ interface IContext {
 }
 
 interface IConfig {
+  basePath?: string;
   map: {
     include?: includeType;
     exclude?: excludeType;
@@ -56,30 +56,10 @@ try {
 
 const diContainerMap: Container = new Container();
 
-function getTsConfigObject(): ITsConfig {
-  const tsConfigFilePath = `${appRoot}/tsconfig.json`;
-  const hasTsConfigFile = fs.existsSync(tsConfigFilePath);
-  if (!hasTsConfigFile) {
-    throw new Error("'tsconfig.json' file is not found.");
-  }
-  const tsConfigFile = fs.readFileSync(tsConfigFilePath);
-  return requireJSON(tsConfigFile.toString());
-}
-
 function getBasePath(): string {
-  const environment = process.env.NODE_ENV;
-  const isProduction = environment === "production";
-
-  if (isProduction) {
-    const { outDir } = getTsConfigObject().compilerOptions;
-
-    if (!outDir) {
-      throw new Error(
-        "'outDir' is not defined. Set the outDir property in the tsconfig file."
-      );
-    }
-
-    return outDir;
+  const basePath = process.env.INVERSIFY_MAPPER_BASE_PATH || config.basePath;
+  if (basePath) {
+    return basePath;
   }
 
   // Development default path
